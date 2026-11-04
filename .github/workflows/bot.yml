@@ -1,0 +1,41 @@
+name: job-bot
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # every 30 minutes; GitHub may delay runs by a few minutes
+  workflow_dispatch: {}      # "Run workflow" button for a manual run
+
+permissions:
+  contents: write            # needed to save state to the bot-state branch
+
+concurrency:
+  group: job-bot             # never run two copies at once
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Restore state
+        id: restore
+        run: bash scripts/state.sh restore
+
+      - name: Run bot
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          HH_USER_AGENT: ${{ secrets.HH_USER_AGENT }}
+          HH_TOKEN: ${{ secrets.HH_TOKEN }}
+        run: python -m bot.main
+
+      - name: Save state
+        # Save even if the bot failed, but never when restore failed (would overwrite good state).
+        if: ${{ !cancelled() && steps.restore.outcome == 'success' }}
+        run: bash scripts/state.sh save

@@ -1,0 +1,53 @@
+# Job bot settings. Edit keywords here; no code changes needed.
+
+[schedule]
+timezone = "Asia/Jerusalem"
+digest_hour = 13          # daily digest is sent on the first run at or after this hour
+max_jobs_per_digest = 15  # extra matches are skipped and counted in the summary
+
+[filters]
+# A job matches if its TITLE contains at least one include keyword (case-insensitive).
+include = [
+  "coordinator", "coordination", "project manager", "programme manager", "program manager",
+  "project officer", "programme officer", "program officer", "project assistant",
+  "programme assistant", "program associate", "operations manager", "operations officer",
+  "operations associate", "administrator", "administrative", "office manager",
+  "executive assistant", "partnerships", "delivery manager",
+  "координатор", "руководитель проект", "менеджер проект", "администратор",
+  "офис-менеджер", "помощник руководителя", "ассистент руководителя",
+]
+# A job is dropped if its TITLE contains any exclude keyword.
+exclude = [
+  "senior software", "engineer", "developer", "devops", "data scientist",
+  "sales development", "account executive", "nurse", "driver",
+  "разработчик", "программист", "продаж",
+]
+# Jobs whose title or description mention these get a "Russian" mark.
+bonus = ["russian", "русск"]
+
+[sources.remotive]
+enabled = true
+# Remotive asks for at most 4 requests a day; the bot fetches the whole board once a day
+# and filters it locally by the keywords above.
+
+[sources.weworkremotely]
+enabled = true
+feeds = [
+  "https://weworkremotely.com/categories/remote-management-and-finance-jobs.rss",
+  "https://weworkremotely.com/categories/remote-product-jobs.rss",
+  "https://weworkremotely.com/categories/remote-customer-support-jobs.rss",
+]
+
+[sources.hh]
+enabled = true
+# One request per query; only vacancies published in the last day.
+queries = ["координатор проектов", "руководитель проектов", "project manager", "координатор"]
+remote_only = true
+
+[linkedin]
+# LinkedIn does not allow automated collection; the digest only includes these search links.
+searches = [
+  { name = "Coordinator, remote", url = "https://www.linkedin.com/jobs/search/?keywords=coordinator%20russian&f_WT=2&f_TPR=r86400" },
+  { name = "Project manager, remote", url = "https://www.linkedin.com/jobs/search/?keywords=project%20manager%20russian&f_WT=2&f_TPR=r86400" },
+  { name = "International organizations", url = "https://www.linkedin.com/jobs/search/?keywords=programme%20officer&f_TPR=r86400" },
+]
